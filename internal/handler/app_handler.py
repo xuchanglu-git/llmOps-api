@@ -49,12 +49,18 @@ class AppHandler:
             return validate_error_json(req.errors)
 
         # 2.构建OpenAI客户端，并发起请求
-        client = OpenAI(base_url=os.getenv("OPENAI_API_BASE"))
+        # client = OpenAI(base_url=os.getenv("OPENAI_API_BASE"))
+        client = OpenAI(
+            api_key="sk-r1dmsG2q5wO2WmXYeNxoaJBkDiiS2Tm3UHQBtprC4JSdUWXT",
+            base_url="https://api.moonshot.cn/v1",
+        )
+
 
         # 3.得到请求响应，然后将OpenAI的响应传递给前端
         completion = client.chat.completions.create(
-            model="gpt-3.5-turbo-16k",
-            messages=[
+            # model="gpt-3.5-turbo-16k",
+            model="kimi-k2.5",
+            messages = [
                 {"role": "system", "content": "你是OpenAI开发的聊天机器人，请根据用户的输入回复对应的信息"},
                 {"role": "user", "content": req.query.data},
             ]
