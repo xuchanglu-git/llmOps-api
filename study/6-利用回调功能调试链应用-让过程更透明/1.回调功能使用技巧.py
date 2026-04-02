@@ -58,7 +58,12 @@ class LLMOpsCallbackHandler(BaseCallbackHandler):
 prompt = ChatPromptTemplate.from_template("{query}")
 
 # 2.创建大语言模型
-llm = ChatOpenAI(model="gpt-3.5-turbo-16k")
+# llm = ChatOpenAI(model="gpt-3.5-turbo-16k")
+llm = ChatOpenAI(
+    api_key="sk-r1dmsG2q5wO2WmXYeNxoaJBkDiiS2Tm3UHQBtprC4JSdUWXT",
+    base_url="https://api.moonshot.cn/v1",
+    model="kimi-k2.5",
+)
 
 # 3.构建链
 chain = {"query": RunnablePassthrough()} | prompt | llm | StrOutputParser()
@@ -70,4 +75,5 @@ resp = chain.stream(
 )
 
 for chunk in resp:
+    print('====',chunk)
     pass

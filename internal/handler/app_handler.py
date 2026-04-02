@@ -7,9 +7,13 @@
 """
 import os
 import uuid
+from uuid  import UUID
 from dataclasses import dataclass
 
 from injector import inject
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
 from openai import OpenAI
 
 from internal.exception import FailException
@@ -29,17 +33,43 @@ class AppHandler:
         app = self.app_service.create_app()
         return success_message(f"应用已经成功创建，id为{app.id}")
 
-    def get_app(self, id: uuid.UUID):
+    def get_app(self, id: UUID):
         app = self.app_service.get_app(id)
         return success_message(f"应用已经成功获取，名字是{app.name}")
 
-    def update_app(self, id: uuid.UUID):
+    def update_app(self, id: UUID):
         app = self.app_service.update_app(id)
         return success_message(f"应用已经成功修改，修改的名字是:{app.name}")
 
-    def delete_app(self, id: uuid.UUID):
+    def delete_app(self, id: UUID):
         app = self.app_service.delete_app(id)
-        return success_message(f"应用已经成功删除，id为:{app.id}")
+        return success_message(f"应用已经成功删除，id 为:{app.id}")
+
+    def debug(self, id: UUID):
+        """聊天接口"""
+        # 1.提取从接口中获取的输入，POST
+        req = CompletionReq()
+        if not req.validate():
+            return validate_error_json(req.errors)
+
+        # 2.构建组件
+        prompt = ChatPromptTemplate.from_template("{query}")
+        # llm = ChatOpenAI(model="gpt-3.5-turbo-16k")
+        llm = ChatOpenAI(
+            api_key="sk-r1dmsG2q5wO2WmXYeNxoaJBkDiiS2Tm3UHQBtprC4JSdUWXT",
+            base_url="https://api.moonshot.cn/v1",
+            model="kimi-k2.5",
+        )
+
+        parser = StrOutputParser()
+
+        # 3.构建链
+        chain = prompt | llm | parser
+
+        # 4.调用链得到结果
+        content = chain.invoke({"query": req.query.data})
+
+        return success_json({"content": content})
 
     def completion(self):
         """聊天接口"""
