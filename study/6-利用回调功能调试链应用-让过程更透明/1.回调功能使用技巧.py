@@ -75,5 +75,5 @@ resp = chain.stream(
 )
 
 for chunk in resp:
-    print('====',chunk)
+    print(chunk, flush=True, end="")
     pass

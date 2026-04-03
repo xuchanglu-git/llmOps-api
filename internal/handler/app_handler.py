@@ -11,6 +11,7 @@ from uuid  import UUID
 from dataclasses import dataclass
 
 from injector import inject
+from flask import request
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
@@ -47,6 +48,14 @@ class AppHandler:
 
     def debug(self, id: UUID):
         """聊天接口"""
+        # 打印所有参数
+        print(f"\n{'='*60}")
+        print(f"URL 参数 - id: {id}")
+        print(f"Request 方法：{request.method}")
+        print(f"Request Headers: {dict(request.headers)}")
+        print(f"Request JSON Body: {request.get_json()}")
+        print(f"{'='*60}\n")
+        
         # 1.提取从接口中获取的输入，POST
         req = CompletionReq()
         if not req.validate():
@@ -93,7 +102,8 @@ class AppHandler:
             messages = [
                 {"role": "system", "content": "你是OpenAI开发的聊天机器人，请根据用户的输入回复对应的信息"},
                 {"role": "user", "content": req.query.data},
-            ]
+            ],
+            stream=True,
         )
 
         content = completion.choices[0].message.content
